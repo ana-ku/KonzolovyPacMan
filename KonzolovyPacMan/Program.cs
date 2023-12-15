@@ -119,14 +119,12 @@ while (true) {
     VymazatHrace();
 
     //Uložit předchozí pozici hráče
-    predchoziSouradniceHrace = souradniceHrace;
+    predchoziSouradniceHrace = souradniceHrace; //nefunguje, mění se společně se souradniceHrace
 
     //Stisknutí klávesy - vypočte nový index pozice hráče
-    
     StisknutiKlavesy();
 
     //Změna pozice hráče - znovu umístí hráče 
-
     PoziceHrace(souradniceHrace[1], souradniceHrace[0]);
   
 
