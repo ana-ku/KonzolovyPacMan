@@ -40,6 +40,7 @@ Dictionary<string, int[]> seznamPrvku = new Dictionary<string, int[]>() {
 //player
 int[] pocatecniSouradniceHrace = new int[2] { 5, 5 };
 int[] souradniceHrace = new int[2];
+int[] predchoziSouradniceHrace = new int[2];
 
 
 //STAVBA POLE
@@ -116,18 +117,31 @@ while (true) {
     //Odstranit hráče ze současné pozice
 
     VymazatHrace();
+
+    //Uložit předchozí pozici hráče
+    predchoziSouradniceHrace = souradniceHrace;
+
     //Stisknutí klávesy - vypočte nový index pozice hráče
+    
     StisknutiKlavesy();
 
     //Změna pozice hráče - znovu umístí hráče 
 
     PoziceHrace(souradniceHrace[1], souradniceHrace[0]);
+  
 
     Console.Clear();
-    
+    if (pocetDrahokamu == 0)
+    {
+        Console.WriteLine("Vyhráli jste! Ukončete stisknutím Q.");
+    }
+    else 
+    { 
+
     OkrajPoleHorniDolni(); 
 
     Console.WriteLine();
+
     foreach (var item in pole)
     {
         Console.WriteLine(item.ToString());
@@ -135,6 +149,7 @@ while (true) {
     OkrajPoleHorniDolni();
 
     Console.WriteLine("\nZbývající počet drahokamů: " + pocetDrahokamu);
+    }
 }
 
 
@@ -164,6 +179,12 @@ void PoziceHrace(int x, int y)
     {
         pocetDrahokamu--;
     }
+    if (znak.Equals('x'))
+    {
+        //nějak zachovat původní souřadnice?;
+        souradniceHrace = predchoziSouradniceHrace;
+    }
+
     pole[y] = pole[y].Remove(x, 1).Insert(x, hracZnak);
 
 }
@@ -196,19 +217,19 @@ if (stisknutaKlavesa == ConsoleKey.Q)
 {
     System.Environment.Exit(0);
 }
-if (stisknutaKlavesa == ConsoleKey.UpArrow)
+if (stisknutaKlavesa == ConsoleKey.UpArrow && souradniceHrace[0] > 0)
 {
     souradniceHrace[0]--;
 }
-if (stisknutaKlavesa == ConsoleKey.DownArrow)
+if (stisknutaKlavesa == ConsoleKey.DownArrow && souradniceHrace[0] < vyska -1)
 {
     souradniceHrace[0]++;
 }
-if (stisknutaKlavesa == ConsoleKey.LeftArrow)
+if (stisknutaKlavesa == ConsoleKey.LeftArrow && souradniceHrace[1] > 1)
 {
     souradniceHrace[1]--;
 }
-if (stisknutaKlavesa == ConsoleKey.RightArrow)
+if (stisknutaKlavesa == ConsoleKey.RightArrow && souradniceHrace[1] < sirka)
 {
     souradniceHrace[1]++;
 }
