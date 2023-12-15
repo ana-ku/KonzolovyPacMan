@@ -75,10 +75,12 @@ for (int j = 0; j < vyska; j++)
  
 }
 //vyměnit za překážky/poklady
+int pocetDrahokamu = 0;
 foreach (KeyValuePair<string, int[]> entry in seznamPrvku)
 {
     int hodnotaX = entry.Value[1];
     int hodnotaY = entry.Value[0];
+    
 
     if (entry.Key.StartsWith("X"))
     {
@@ -86,6 +88,7 @@ foreach (KeyValuePair<string, int[]> entry in seznamPrvku)
     }
     else
     {
+        pocetDrahokamu++;
         pole[hodnotaY] = pole[hodnotaY].Remove(hodnotaX, 1).Insert(hodnotaX, pokladZnak);
     }
 
@@ -103,10 +106,9 @@ foreach (var item in pole)
     Console.WriteLine(item.ToString());
 }
 
-
-
 //dolní okraj pole
 OkrajPoleHorniDolni();
+Console.WriteLine("\nZbývající počet drahokamů: " + pocetDrahokamu);
 
 //HRA! 
 
@@ -116,8 +118,6 @@ while (true) {
     VymazatHrace();
     //Stisknutí klávesy - vypočte nový index pozice hráče
     StisknutiKlavesy();
-
-   
 
     //Změna pozice hráče - znovu umístí hráče 
 
@@ -134,7 +134,9 @@ while (true) {
     }
     OkrajPoleHorniDolni();
 
+    Console.WriteLine("\nZbývající počet drahokamů: " + pocetDrahokamu);
 }
+
 
 
 
@@ -154,6 +156,13 @@ void PoziceHrace(int x, int y)
    
     if(y >=0 && y < vyska) { 
     souradniceHrace[0] = y;
+    }
+    //pokud je na nové pozici drahokam
+    string radek = pole[y];
+    char znak = radek[x];
+    if(znak.Equals('o'))
+    {
+        pocetDrahokamu--;
     }
     pole[y] = pole[y].Remove(x, 1).Insert(x, hracZnak);
 
