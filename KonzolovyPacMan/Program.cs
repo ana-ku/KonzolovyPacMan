@@ -1,8 +1,7 @@
-﻿//příprava herního pole
-
+﻿using Microsoft.VisualBasic.Devices;
 using System.Runtime.CompilerServices;
-
-//rozměry pole, pevně dané
+using System.Windows.Forms;
+//Rozměry pole, pevně dané
 int vyska = 8;
 int sirka = 30;
 
@@ -10,6 +9,7 @@ int sirka = 30;
 //Znaky prvků
 string prekazkaZnak = "x";
 string pokladZnak = "o";
+string hracZnak = "P";
 
 //Soupis prvků (souřadnice Y,X)
 Dictionary<string, int[]> seznamPrvku = new Dictionary<string, int[]>() {
@@ -37,14 +37,20 @@ Dictionary<string, int[]> seznamPrvku = new Dictionary<string, int[]>() {
     { "o8", new int[] { 7, 19 } },
 };
 
+//player
+int[] pocatecniSouradniceHrace = new int[2] { 5, 5 };
+int[] souradniceHrace = new int[2];
+
 
 //STAVBA POLE
-//horní okraj pole +-----+
-OkrajPoleHorniDolni();
+//horní okraj pole
+OkrajPoleHorniDolni(); //nemění se
    
 Console.WriteLine();
 
-//tělo pole
+
+
+//TĚLO POLE
 string[] pole = new string[vyska];
 for (int j = 0; j < vyska; j++)
 {
@@ -76,25 +82,82 @@ foreach (KeyValuePair<string, int[]> entry in seznamPrvku)
 
     if (entry.Key.StartsWith("X"))
     {
-        pole[hodnotaY].Remove(hodnotaX, 1).Insert(hodnotaX, "X");
+        pole[hodnotaY] = pole[hodnotaY].Remove(hodnotaX, 1).Insert(hodnotaX, prekazkaZnak);
     }
     else
     {
-        pole[hodnotaY].Remove(hodnotaX, 1).Insert(hodnotaX, "o");
+        pole[hodnotaY] = pole[hodnotaY].Remove(hodnotaX, 1).Insert(hodnotaX, pokladZnak);
     }
 
 }
 
-//vypsat obsah pole
+//Umístit hráče na výchozí pozici
+
+PoziceHrace(pocatecniSouradniceHrace[1], pocatecniSouradniceHrace[0]);
+
+
+//Vypsat obsah pole
+
 foreach (var item in pole)
 {
     Console.WriteLine(item.ToString());
 }
 
+
+
 //dolní okraj pole
 OkrajPoleHorniDolni();
 
+//HRA! 
 
+while (true) {
+    //Odstranit hráče ze současné pozice
+
+    VymazatHrace();
+    //Stisknutí klávesy - vypočte nový index pozice hráče
+    StisknutiKlavesy();
+
+   
+
+    //Změna pozice hráče - znovu umístí hráče 
+
+    PoziceHrace(souradniceHrace[1], souradniceHrace[0]);
+
+    Console.Clear();
+    
+    OkrajPoleHorniDolni(); 
+
+    Console.WriteLine();
+    foreach (var item in pole)
+    {
+        Console.WriteLine(item.ToString());
+    }
+    OkrajPoleHorniDolni();
+
+}
+
+
+
+//METODY
+void VymazatHrace()
+{
+    var x = souradniceHrace[1];
+    var y = souradniceHrace[0];
+    pole[y] = pole[y].Remove(x, 1).Insert(x, " ");
+
+}
+void PoziceHrace(int x, int y)
+{
+    if(x >=0 && x<sirka) { 
+    souradniceHrace[1] = x;
+    }
+   
+    if(y >=0 && y < vyska) { 
+    souradniceHrace[0] = y;
+    }
+    pole[y] = pole[y].Remove(x, 1).Insert(x, hracZnak);
+
+}
 void NapisZnak(string znak)
 {
    Console.Write(znak);
@@ -109,3 +172,37 @@ void OkrajPoleHorniDolni()
     }
     NapisZnak("+");
 }
+
+
+//
+ConsoleKey ZjistitKlavesu()
+{
+    var key = Console.ReadKey(true);
+    return key.Key;
+}
+
+void StisknutiKlavesy() { 
+ConsoleKey stisknutaKlavesa = ZjistitKlavesu();
+if (stisknutaKlavesa == ConsoleKey.Q)
+{
+    System.Environment.Exit(0);
+}
+if (stisknutaKlavesa == ConsoleKey.UpArrow)
+{
+    souradniceHrace[0]--;
+}
+if (stisknutaKlavesa == ConsoleKey.DownArrow)
+{
+    souradniceHrace[0]++;
+}
+if (stisknutaKlavesa == ConsoleKey.LeftArrow)
+{
+    souradniceHrace[1]--;
+}
+if (stisknutaKlavesa == ConsoleKey.RightArrow)
+{
+    souradniceHrace[1]++;
+}
+}
+
+Console.ReadLine();
