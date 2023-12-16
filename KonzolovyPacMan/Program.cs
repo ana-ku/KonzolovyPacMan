@@ -205,7 +205,8 @@ ConsoleKey ZjistitKlavesu()
 }
 
 void StisknutiKlavesy() {
-
+     
+    //uložím si předchozí souřadnice
     predchoziSouradnice0 = souradniceHrace[0];
     predchoziSouradnice1 = souradniceHrace[1];
     
@@ -233,6 +234,8 @@ if (stisknutaKlavesa == ConsoleKey.RightArrow && souradniceHrace[1] < sirka)
 {
     souradniceHrace[1]++;
 }
+ 
+//kontrola, jestli není na nově přistupovaném poli znak X
 
     string radek = pole[souradniceHrace[0]];
     char znak = radek[souradniceHrace[1]];
