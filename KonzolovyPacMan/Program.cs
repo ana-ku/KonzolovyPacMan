@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic.Devices;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
+using System.Windows.Forms.Design;
 //Rozměry pole, pevně dané
 int vyska = 8;
 int sirka = 30;
@@ -40,7 +41,8 @@ Dictionary<string, int[]> seznamPrvku = new Dictionary<string, int[]>() {
 //player
 int[] pocatecniSouradniceHrace = new int[2] { 5, 5 };
 int[] souradniceHrace = new int[2];
-int[] predchoziSouradniceHrace = new int[2];
+int predchoziSouradnice0;
+int predchoziSouradnice1;
 
 
 //STAVBA POLE
@@ -114,12 +116,10 @@ Console.WriteLine("\nZbývající počet drahokamů: " + pocetDrahokamu);
 //HRA! 
 
 while (true) {
+
+
     //Odstranit hráče ze současné pozice
-
     VymazatHrace();
-
-    //Uložit předchozí pozici hráče
-    predchoziSouradniceHrace = souradniceHrace; //nefunguje, mění se společně se souradniceHrace
 
     //Stisknutí klávesy - vypočte nový index pozice hráče
     StisknutiKlavesy();
@@ -156,6 +156,7 @@ while (true) {
 //METODY
 void VymazatHrace()
 {
+
     var x = souradniceHrace[1];
     var y = souradniceHrace[0];
     pole[y] = pole[y].Remove(x, 1).Insert(x, " ");
@@ -163,13 +164,9 @@ void VymazatHrace()
 }
 void PoziceHrace(int x, int y)
 {
-    if(x >=0 && x<sirka) { 
     souradniceHrace[1] = x;
-    }
-   
-    if(y >=0 && y < vyska) { 
     souradniceHrace[0] = y;
-    }
+  
     //pokud je na nové pozici drahokam
     string radek = pole[y];
     char znak = radek[x];
@@ -177,13 +174,11 @@ void PoziceHrace(int x, int y)
     {
         pocetDrahokamu--;
     }
-    if (znak.Equals('x'))
-    {
-        //nějak zachovat původní souřadnice?;
-        souradniceHrace = predchoziSouradniceHrace;
-    }
-
+    
+   
     pole[y] = pole[y].Remove(x, 1).Insert(x, hracZnak);
+    
+
 
 }
 void NapisZnak(string znak)
@@ -209,8 +204,15 @@ ConsoleKey ZjistitKlavesu()
     return key.Key;
 }
 
-void StisknutiKlavesy() { 
-ConsoleKey stisknutaKlavesa = ZjistitKlavesu();
+void StisknutiKlavesy() {
+
+    predchoziSouradnice0 = souradniceHrace[0];
+    predchoziSouradnice1 = souradniceHrace[1];
+    
+    
+    //pokud není na políčku X
+
+    ConsoleKey stisknutaKlavesa = ZjistitKlavesu();
 if (stisknutaKlavesa == ConsoleKey.Q)
 {
     System.Environment.Exit(0);
@@ -231,6 +233,18 @@ if (stisknutaKlavesa == ConsoleKey.RightArrow && souradniceHrace[1] < sirka)
 {
     souradniceHrace[1]++;
 }
+
+    string radek = pole[souradniceHrace[0]];
+    char znak = radek[souradniceHrace[1]];
+    if(znak == 'x')
+    {
+        souradniceHrace[1] = predchoziSouradnice1;
+        souradniceHrace[0] = predchoziSouradnice0;
+    }
+}
+void PrestatPoslouchatKlavesy()
+{
+
 }
 
 Console.ReadLine();
