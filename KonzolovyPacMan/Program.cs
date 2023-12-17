@@ -1,44 +1,36 @@
 ﻿using Microsoft.VisualBasic.Devices;
+using System.Diagnostics.Metrics;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
+using System.Text.RegularExpressions;
+using System;
 //Rozměry pole, pevně dané
 int vyska = 8;
 int sirka = 30;
-
 
 //Znaky prvků
 string prekazkaZnak = "x";
 string pokladZnak = "o";
 string hracZnak = "P";
 
-//Soupis prvků (souřadnice Y,X)
-Dictionary<string, int[]> seznamPrvku = new Dictionary<string, int[]>() {
-    { "X1", new int[] { 0, 5 } },
-    { "X2", new int[] { 1, 5 } },
-    { "X3", new int[] { 1, 20 } },
-    { "X4", new int[] { 1, 21 } },
-    { "X5", new int[] { 1, 22 } },
-    { "X6", new int[] { 2, 12 } },
-    { "X7", new int[] { 2, 22 } },
-    { "X8", new int[] { 3, 22 } },
-    { "X9", new int[] { 4, 4 } },
-    { "X10", new int[] { 5, 4 } },
-    { "X11", new int[] { 6, 4 } },
-    { "X12", new int[] { 6, 18 } },
-    { "X13", new int[] { 6, 19 } },
-    { "X14", new int[] { 6, 20 } },
-    { "o1", new int[] { 0, 2 } },
-    { "o2", new int[] { 0, 25 } },
-    { "o3", new int[] { 1, 9 } },
-    { "o4", new int[] { 3, 23 } },
-    { "o5", new int[] { 4, 2 } },
-    { "o6", new int[] { 4, 17 } },
-    { "o7", new int[] { 7, 2 } },
-    { "o8", new int[] { 7, 19 } },
-};
+//Příprava k načtení souboru s překážkami/poklady
+int pocetLevelu = 3;
+string level = "level";
+string[] levely = new string[pocetLevelu];
+string cesta = @"../../../";
 
-//player
+for(int i = 0; i<pocetLevelu; i++)
+{
+    levely[i] = cesta + level + (i.ToString()) + ".txt";
+}
+
+//Obsah levelu
+int soucasnyLevel = 0;
+Dictionary<string, int[]> seznamPrvku = new Dictionary<string, int[]>();
+int pocetDrahokamu = 0;
+
+//Player
 int[] pocatecniSouradniceHrace = new int[2] { 5, 5 };
 int[] souradniceHrace = new int[2];
 int predchoziSouradnice0;
@@ -46,18 +38,15 @@ int predchoziSouradnice1;
 
 
 //STAVBA POLE
-//horní okraj pole
+//Horní okraj pole
 OkrajPoleHorniDolni(); //nemění se
    
 Console.WriteLine();
 
-
-
-//TĚLO POLE
+//Tělo pole
 string[] pole = new string[vyska];
 for (int j = 0; j < vyska; j++)
-{
-    
+{   
     for (int i = 0; i <= sirka; i++)
     {
         if (i == 0)
@@ -77,25 +66,12 @@ for (int j = 0; j < vyska; j++)
     }
  
 }
-//vyměnit za překážky/poklady
-int pocetDrahokamu = 0;
-foreach (KeyValuePair<string, int[]> entry in seznamPrvku)
-{
-    int hodnotaX = entry.Value[1];
-    int hodnotaY = entry.Value[0];
-    
 
-    if (entry.Key.StartsWith("X"))
-    {
-        pole[hodnotaY] = pole[hodnotaY].Remove(hodnotaX, 1).Insert(hodnotaX, prekazkaZnak);
-    }
-    else
-    {
-        pocetDrahokamu++;
-        pole[hodnotaY] = pole[hodnotaY].Remove(hodnotaX, 1).Insert(hodnotaX, pokladZnak);
-    }
+//Naplnit level
+NacistObsahLevelu();
 
-}
+
+
 
 //Umístit hráče na výchozí pozici
 
@@ -111,7 +87,9 @@ foreach (var item in pole)
 
 //dolní okraj pole
 OkrajPoleHorniDolni();
+
 Console.WriteLine("\nZbývající počet drahokamů: " + pocetDrahokamu);
+Console.WriteLine("Level " + (soucasnyLevel +1) + "/" + pocetLevelu);
 
 //HRA! 
 
@@ -126,15 +104,27 @@ while (true) {
 
     //Změna pozice hráče - znovu umístí hráče 
     PoziceHrace(souradniceHrace[1], souradniceHrace[0]);
-  
 
     Console.Clear();
+
     if (pocetDrahokamu == 0)
     {
+        Console.Clear();
         Console.WriteLine("Vyhráli jste! Ukončete stisknutím Q.");
+        if (soucasnyLevel < pocetLevelu - 1)
+        {
+        Console.WriteLine("Nebo pokračujte na další level stisknutím Enter.");
+        if (ZjistitKlavesu() == ConsoleKey.Enter)
+        {
+            Console.Clear();
+            soucasnyLevel++;
+            VymazatPredchoziLevel();
+            NacistObsahLevelu();
+            PoziceHrace(pocatecniSouradniceHrace[1], pocatecniSouradniceHrace[0]);
+            }
+        }
     }
-    else 
-    { 
+    
 
     OkrajPoleHorniDolni(); 
 
@@ -147,10 +137,10 @@ while (true) {
     OkrajPoleHorniDolni();
 
     Console.WriteLine("\nZbývající počet drahokamů: " + pocetDrahokamu);
-    }
+    Console.WriteLine("Level " + (soucasnyLevel +1) + "/" + pocetLevelu);
+
+
 }
-
-
 
 
 //METODY
@@ -162,6 +152,7 @@ void VymazatHrace()
     pole[y] = pole[y].Remove(x, 1).Insert(x, " ");
 
 }
+
 void PoziceHrace(int x, int y)
 {
     souradniceHrace[1] = x;
@@ -175,11 +166,8 @@ void PoziceHrace(int x, int y)
         pocetDrahokamu--;
     }
     
-   
     pole[y] = pole[y].Remove(x, 1).Insert(x, hracZnak);
     
-
-
 }
 void NapisZnak(string znak)
 {
@@ -205,15 +193,15 @@ ConsoleKey ZjistitKlavesu()
 }
 
 void StisknutiKlavesy() {
-     
-    //uložím si předchozí souřadnice
+
+    //Uložím si předchozí souřadnice
     predchoziSouradnice0 = souradniceHrace[0];
     predchoziSouradnice1 = souradniceHrace[1];
-    
-    
-    //pokud není na políčku X
+
+    //Změna souřadnic 
 
     ConsoleKey stisknutaKlavesa = ZjistitKlavesu();
+
 if (stisknutaKlavesa == ConsoleKey.Q)
 {
     System.Environment.Exit(0);
@@ -235,7 +223,7 @@ if (stisknutaKlavesa == ConsoleKey.RightArrow && souradniceHrace[1] < sirka)
     souradniceHrace[1]++;
 }
  
-//kontrola, jestli není na nově přistupovaném poli znak X
+//Kontrola, jestli není na nově přistupovaném poli znak X
 
     string radek = pole[souradniceHrace[0]];
     char znak = radek[souradniceHrace[1]];
@@ -245,9 +233,48 @@ if (stisknutaKlavesa == ConsoleKey.RightArrow && souradniceHrace[1] < sirka)
         souradniceHrace[0] = predchoziSouradnice0;
     }
 }
-void PrestatPoslouchatKlavesy()
+void NacistObsahLevelu()
 {
 
+    pocetDrahokamu = 0;
+    seznamPrvku.Clear();
+
+    string[] radkyLevelu = File.ReadAllLines(levely[soucasnyLevel]);
+    
+    //připravit slovník
+    foreach (var item in radkyLevelu)
+    {
+        string[] info = item.Split(':');
+        string[] cislaString = info[1].Split(' ');
+        int[] cislaInt = Array.ConvertAll(cislaString, s => int.Parse(s));
+        seznamPrvku.Add(info[0], new int[] { cislaInt[0], cislaInt[1] }); //Vytvoření slovníku s překážkami a poklady
+    }
+    //Vyměnit za překážky/poklady
+    foreach (KeyValuePair<string, int[]> entry in seznamPrvku)
+    {
+        int hodnotaX = entry.Value[1];
+        int hodnotaY = entry.Value[0];
+
+
+        if (entry.Key.StartsWith("X"))
+        {
+            pole[hodnotaY] = pole[hodnotaY].Remove(hodnotaX, 1).Insert(hodnotaX, prekazkaZnak);
+        }
+        else
+        {
+            pocetDrahokamu++;
+            pole[hodnotaY] = pole[hodnotaY].Remove(hodnotaX, 1).Insert(hodnotaX, pokladZnak);
+        }
+
+    }
+
+}
+void VymazatPredchoziLevel() 
+{
+    for (int i = 0; i <pole.Length;i++)
+    {
+        pole[i] = pole[i].Replace(prekazkaZnak, " ").Replace(pokladZnak, " ");
+    }
 }
 
 Console.ReadLine();
