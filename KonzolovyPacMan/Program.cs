@@ -7,70 +7,77 @@ using System.Text.RegularExpressions;
 using System;
 using KonzolovyPacMan;
 using System.Security.Authentication.ExtendedProtection;
+using System.Reflection.Emit;
 
 
-//Všechny levely
-Level level0 = new Level(0, 8, 35, 'V', new int[2] { 0, 4 }, "level0.txt");
-Level level1 = new Level(1, 9, 54, 'J', new int[2] { 2, 30 }, "level1.txt");
-Level level2 = new Level(2, 14, 20, 'H', new int[2] { 11, 15 }, "level2.txt");
+//Projít všechny soubory v /data
 
-//Seznam levelů
-List<Level> seznamLevelu = new List<Level> {level0, level1, level2};
+string root = @"../../../data/";
+List<Level> seznamLevelu = new List<Level>() ;
+var soubory = from soubor in Directory.EnumerateFiles(root) select soubor;
+foreach (var soubor in soubory)
+{
+    Level level = new Level(soubor);
+    seznamLevelu.Add(level);
+}
 
 
 int predchoziSouradnice0;
 int predchoziSouradnice1;
-int soucasnyLevelInt = 0;
+int indexSoucasnehoLevelu = 0;
 
 //HRA! 
 
-Level aktualniLevel = NacistLevel(soucasnyLevelInt);
+Level aktualniLevel = NactiLevel(indexSoucasnehoLevelu);
 
-string[] pole = VypsatLevel(aktualniLevel);
+string[] hraciPole = aktualniLevel.NactiObsahLevelu(aktualniLevel.ZiskejZakladniPole());
 
-while (true) {
-aktualniLevel.VymazatHrace(pole);
+aktualniLevel.VypisPole(hraciPole);
 
+while (true)
+{
 
-aktualniLevel.StisknutiKlavesy(pole);
-
-
-pole = aktualniLevel.PoziceHrace(pole, aktualniLevel.souradniceHrace[1], aktualniLevel.souradniceHrace[0]);
+    aktualniLevel.VymazHrace(hraciPole);
 
 
-aktualniLevel.VypisPole(pole);
+    aktualniLevel.ProvedStisknutiKlavesy(hraciPole);
 
-if(aktualniLevel.pocetDrahokamu == 0)
+
+    hraciPole = aktualniLevel.ZmenPoziciHrace(hraciPole);
+
+
+    aktualniLevel.VypisPole(hraciPole);
+
+    if (aktualniLevel.PocetDrahokamu == 0)
     {
         Console.Clear();
         Console.WriteLine("Vyhráli jste! Ukončete stisknutím Q.");
-        if (soucasnyLevelInt < seznamLevelu.Count -1)
+        if (indexSoucasnehoLevelu < seznamLevelu.Count - 1)
         {
             Console.WriteLine("Nebo pokračujte na další level stisknutím Enter.");
-            if (aktualniLevel.ZjistitKlavesu() == ConsoleKey.Enter)
+            if (aktualniLevel.ZjistiKlavesu() == ConsoleKey.Enter)
             {
                 Console.Clear();
-                soucasnyLevelInt++;
-                aktualniLevel = NacistLevel(soucasnyLevelInt);
-                pole = VypsatLevel(NacistLevel(soucasnyLevelInt));
+                indexSoucasnehoLevelu++;
+                aktualniLevel = NactiLevel(indexSoucasnehoLevelu);
+                hraciPole = NactiPole(NactiLevel(indexSoucasnehoLevelu));
+                aktualniLevel.VypisPole(hraciPole);
             }
         }
     }
 }
 
-Level NacistLevel(int cislo) {
+Level NactiLevel(int cislo)
+{
 
     Level aktualniLevel = seznamLevelu[cislo];
     return aktualniLevel;
 }
 
-string[] VypsatLevel(Level level)
+string[] NactiPole(Level level)
 {
-    string[] pole = level.NactiObsahLevelu(level.ZakladniPole());
-
-    level.VypisPole(pole);
-    return pole;
-
+    string[] hraciPole = level.NactiObsahLevelu(level.ZiskejZakladniPole());
+    return hraciPole;
 }
 
 Console.ReadLine();

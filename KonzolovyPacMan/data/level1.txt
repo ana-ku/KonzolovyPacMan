@@ -1,0 +1,10 @@
+Index levelu:1
+Výška pole Y:15
+Šířka pole X:20
+Počáteční souřadnice hráče:3 5
+Znak pro překážku:J
+Překážky a drahokamy:
+X1:8 7
+X2:14 2
+o5:4 4
+o6:2 14
