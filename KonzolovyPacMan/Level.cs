@@ -22,9 +22,9 @@ namespace KonzolovyPacMan
         public int PocetDrahokamu = 0;
         Dictionary<string, int[]> SeznamPrvku = new Dictionary<string, int[]>();
 
+        public Pozice PredchoziSouradniceHrace = new Pozice();
 
-        int predchoziSouradnice0;
-        int predchoziSouradnice1;
+       
 
 
         public Level(string cestaKSouboru)
@@ -114,8 +114,8 @@ namespace KonzolovyPacMan
         {
             //nejprve vymazat současnou pozici
 
-            var a = predchoziSouradnice0;
-            var b = predchoziSouradnice1;
+            var a = PredchoziSouradniceHrace.X;
+            var b = PredchoziSouradniceHrace.Y;
             hraciPole[b] = hraciPole[b].Remove(a, 1).Insert(a, " ");
 
             //pak provést změnu pozice
@@ -203,8 +203,8 @@ namespace KonzolovyPacMan
         public void ProvedStisknutiKlavesy(string[] hraciPole)
         {
             //Uložím si předchozí souřadnice
-            predchoziSouradnice0 = SouradniceHrace.X;
-            predchoziSouradnice1 = SouradniceHrace.Y;
+            PredchoziSouradniceHrace.X = SouradniceHrace.X;
+            PredchoziSouradniceHrace.Y = SouradniceHrace.Y;
 
             //Změna souřadnic 
 
@@ -239,8 +239,8 @@ namespace KonzolovyPacMan
 
             if (znak == PrekazkaZnak)
             {
-                SouradniceHrace.Y = predchoziSouradnice1;
-                SouradniceHrace.X = predchoziSouradnice0;
+                SouradniceHrace.X = PredchoziSouradniceHrace.X;
+                SouradniceHrace.Y = PredchoziSouradniceHrace.Y;
             }
         }
 
