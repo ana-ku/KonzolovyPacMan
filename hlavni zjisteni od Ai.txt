@@ -1,0 +1,13 @@
+Hlavní zjištění získaná od AI:
+
+- Metody s return type bool
+
+bool NejakaMetoda() {
+return nejakaPodminka //např. počet něčeho == 0
+} -> bude mít hodnotu false, dokud nebude splněná podmínka
+
+
+- při procházení kolekcí můžu použít místo foreach/for LINQ 
+např. return files.Select(file => new Level(file)).ToList();  //jednořádkové řešení
+
+Cílem je kompartmentalizovat program na jednotlivé moduly (hra, level...možná i hrací pole?), aby v program.cs bylo co nejméně procedurálního kódu (snad to slovo používám správně?)

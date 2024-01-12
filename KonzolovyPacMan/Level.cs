@@ -21,20 +21,22 @@ namespace KonzolovyPacMan
         public Pozice SouradniceHrace = new Pozice();
         public int PocetDrahokamu = 0;
         Dictionary<string, int[]> SeznamPrvku = new Dictionary<string, int[]>();
-
+        string[] obsahSouboru;
         public Pozice PredchoziSouradniceHrace = new Pozice();
-
-       
 
 
         public Level(string cestaKSouboru)
         {
             CestaKSouboru = cestaKSouboru;
-            string[] obsahSouboru = File.ReadAllLines(CestaKSouboru);
+            obsahSouboru = File.ReadAllLines(CestaKSouboru);
 
-            //Vytáhnout informace ze souboru
+            InicializovatLevel(); //AI: v konstruktoru použít metodu pro inicializování levelu namísto konkrétního kódu pro inicializaci levelu
+        }
+
+        private void InicializovatLevel()
+        {
             //1. Index levelu
-
+            
             string indexLeveluString = Regex.Match(obsahSouboru[0], @"\d+").Value;
             IndexLevelu = int.Parse(indexLeveluString);
 
@@ -63,10 +65,8 @@ namespace KonzolovyPacMan
             //6. Překážky a drahokamy
             List<string> seznamPrekazekDrahokamu = obsahSouboru.ToList();
             seznamPrekazekDrahokamu.RemoveRange(0, 6);
-            PolePrekazekDrahokamu = seznamPrekazekDrahokamu.ToArray(); 
-
+            PolePrekazekDrahokamu = seznamPrekazekDrahokamu.ToArray();
         }
-
        
         public void NapisZnak(string znak)
         {
@@ -193,6 +193,12 @@ namespace KonzolovyPacMan
             Console.WriteLine("\nZbývající počet drahokamů: " + PocetDrahokamu);
         }
 
+        public bool VyhralHrac() //AI: jednodušší kontrola podmínky ve hře
+        {
+            return PocetDrahokamu == 0; //hodnota bude false, dokud nebude splněná return podmínka
+        }
+
+
         public ConsoleKey ZjistiKlavesu()
         {
             var key = Console.ReadKey(true);
@@ -244,14 +250,7 @@ namespace KonzolovyPacMan
             }
         }
 
-        //public void VymazHrace(string[] hraciPole)
-        //{
-
-        //    var x = SouradniceHrace.X;
-        //    var y = SouradniceHrace.Y;
-        //    hraciPole[y] = hraciPole[y].Remove(x, 1).Insert(x, " ");
-
-        //}
+        
 
     }
 }
