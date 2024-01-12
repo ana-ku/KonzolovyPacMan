@@ -13,12 +13,12 @@ namespace KonzolovyPacMan
         public int Vyska;
         public int Sirka;
         public string PrekazkaZnak;
-        public PoziceHrace PocatecniSouradniceHrace;
+        public Pozice PocatecniSouradniceHrace;
         public string CestaKSouboru;
         public string[] PolePrekazekDrahokamu;
         readonly string PokladZnak = "o";
         readonly string HracZnak = "P";
-        public PoziceHrace SouradniceHrace = new PoziceHrace();
+        public Pozice SouradniceHrace = new Pozice();
         public int PocetDrahokamu = 0;
         Dictionary<string, int[]> SeznamPrvku = new Dictionary<string, int[]>();
 
@@ -53,7 +53,7 @@ namespace KonzolovyPacMan
             string[] pocatPoziceSplit = obsahSouboru[3].Split(':');
             string[] pocatPozice = pocatPoziceSplit[1].Split(' ');
             int[] cislaPocatPozice = Array.ConvertAll(pocatPozice, s => int.Parse(s));
-            PocatecniSouradniceHrace = new PoziceHrace(cislaPocatPozice[0], cislaPocatPozice[1]);
+            PocatecniSouradniceHrace = new Pozice(cislaPocatPozice[0], cislaPocatPozice[1]);
 
 
             //5. Znak pro překážku
@@ -112,6 +112,14 @@ namespace KonzolovyPacMan
 
         public string[] ZmenPoziciHrace(string[] hraciPole)
         {
+            //nejprve vymazat současnou pozici
+
+            var a = predchoziSouradnice0;
+            var b = predchoziSouradnice1;
+            hraciPole[b] = hraciPole[b].Remove(a, 1).Insert(a, " ");
+
+            //pak provést změnu pozice
+
             int y = SouradniceHrace.Y;
             int x = SouradniceHrace.X;
             string radek = hraciPole[y];
@@ -140,20 +148,21 @@ namespace KonzolovyPacMan
             //Vyměnit za překážky/poklady
             foreach (KeyValuePair<string, int[]> entry in SeznamPrvku)
             {
-                int hodnotaX = entry.Value[0] + 1;
-                int hodnotaY = entry.Value[1];
+                Pozice pozicePrekazkyDrahokamu = new Pozice(entry.Value[0] + 1, entry.Value[1]);
+                int hodnotaX = pozicePrekazkyDrahokamu.X;
+                int hodnotaY = pozicePrekazkyDrahokamu.Y;
+
+                bool startsWithX = entry.Key.StartsWith('X');
 
 
-                if (entry.Key.StartsWith('X'))
-                {
-                    zakladniPole[hodnotaY] = zakladniPole[hodnotaY].Remove(hodnotaX, 1).Insert(hodnotaX, PrekazkaZnak);
-                }
-                else
+                zakladniPole[hodnotaY] = zakladniPole[hodnotaY].Remove(hodnotaX, 1).Insert(hodnotaX, startsWithX ? PrekazkaZnak : PokladZnak);
+
+                //pokud klíč neobsahuje X, znamená to, že obsahuje "O", tj značku pro drahokam. Z toho můžu vypočítat počet drahokamů
+                if (!startsWithX)
                 {
                     PocetDrahokamu++;
-                    zakladniPole[hodnotaY] = zakladniPole[hodnotaY].Remove(hodnotaX, 1).Insert(hodnotaX, PokladZnak);
                 }
-
+                
             }
             //Umístit hráče na výchozí pozici
             zakladniPole[PocatecniSouradniceHrace.Y] = zakladniPole[PocatecniSouradniceHrace.Y].Remove(PocatecniSouradniceHrace.X, 1).Insert(PocatecniSouradniceHrace.X, HracZnak);
@@ -235,14 +244,14 @@ namespace KonzolovyPacMan
             }
         }
 
-        public void VymazHrace(string[] hraciPole)
-        {
+        //public void VymazHrace(string[] hraciPole)
+        //{
 
-            var x = SouradniceHrace.X;
-            var y = SouradniceHrace.Y;
-            hraciPole[y] = hraciPole[y].Remove(x, 1).Insert(x, " ");
+        //    var x = SouradniceHrace.X;
+        //    var y = SouradniceHrace.Y;
+        //    hraciPole[y] = hraciPole[y].Remove(x, 1).Insert(x, " ");
 
-        }
+        //}
 
     }
 }

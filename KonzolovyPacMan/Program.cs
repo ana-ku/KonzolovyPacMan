@@ -37,8 +37,6 @@ aktualniLevel.VypisPole(hraciPole);
 while (true)
 {
 
-    aktualniLevel.VymazHrace(hraciPole);
-
 
     aktualniLevel.ProvedStisknutiKlavesy(hraciPole);
 

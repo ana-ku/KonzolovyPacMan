@@ -1,0 +1,2 @@
+Přidat více objektů a tříd - vykreslení herního pole?
+Teleport

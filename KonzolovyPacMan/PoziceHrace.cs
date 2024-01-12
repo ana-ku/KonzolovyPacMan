@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace KonzolovyPacMan
 {
-    internal struct PoziceHrace
+    internal struct Pozice
     {
         public int X { get; set; }
         public int Y { get; set; }
 
-        public PoziceHrace( int x, int y)
+        public Pozice( int x, int y)
         {
             X = x;
             Y = y;
