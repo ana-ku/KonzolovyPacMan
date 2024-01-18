@@ -9,22 +9,30 @@ using KonzolovyPacMan;
 using System.Security.Authentication.ExtendedProtection;
 using System.Reflection.Emit;
 
+namespace KonzolovyPacMan
 
-//Projít všechny soubory v /data
-
-string root = @"../../../data/";
-
-List<Level> SeznamLevelu = NacistSeznamLevelu(root);
-
-Hra hra = new Hra(SeznamLevelu);
-
-hra.Play();
-
-static List<Level> NacistSeznamLevelu(string root)
 {
-    var soubory = Directory.EnumerateFiles(root);
-    return soubory.Select(soubor => new Level(soubor)).ToList();
+    internal class Program
+    {
+        public static void Main()
+        {
 
+            //Projít všechny soubory v /data
+
+             string root = @"../../../data/";
+
+            List<Level> SeznamLevelu = NacistSeznamLevelu(root);
+
+             Hra hra = new Hra(SeznamLevelu);
+
+            hra.Play();
+
+            static List<Level> NacistSeznamLevelu(string root)
+            {
+                var soubory = Directory.EnumerateFiles(root);
+                return soubory.Select(soubor => new Level(soubor)).ToList();
+
+            }
+        }
+    }
 }
-
-Console.ReadLine();
