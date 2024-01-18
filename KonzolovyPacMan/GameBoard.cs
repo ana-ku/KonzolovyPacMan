@@ -117,35 +117,34 @@ namespace KonzolovyPacMan
             }
 
 
-            player.SouradniceHrace.Y = y; // tady se zeptat Honzy.
-            player.SouradniceHrace.X = x;
-
             //Kontrola, jestli není na nově přistupovaném poli znak X
 
             string radek = hraciPole[y];
 
             string znak = radek[x].ToString();
 
-            if (znak == PrekazkaZnak)
+            if (znak != PrekazkaZnak) //pohnu hráčem
             {
-                player.SouradniceHrace.X = player.PredchoziSouradniceHrace.X;
-                player.SouradniceHrace.Y = player.PredchoziSouradniceHrace.Y;
+                //Vymažu současnou pozici
+                hraciPole[b] = hraciPole[b].Remove(a, 1).Insert(a, " ");
+
+
+                //pak provedu změnu pozice
+
+                hraciPole[y] = hraciPole[y].Remove(x, 1).Insert(x, HracZnak);
+
+                if (znak == PokladZnak)
+                {
+                    PocetDrahokamu--;
+                }
+                player.SouradniceHrace.X = x;
+                player.SouradniceHrace.Y = y;
             }
-            if (znak == PokladZnak)
+            else
             {
-                PocetDrahokamu--;
+                player.SouradniceHrace.X = a;
+                player.SouradniceHrace.Y = b;
             }
-
-
-
-            //Vymažu současnou pozici
-
-            hraciPole[b] = hraciPole[b].Remove(a, 1).Insert(a, " ");
-
-
-            //pak provedu změnu pozice
-
-            hraciPole[y] = hraciPole[y].Remove(x, 1).Insert(x, HracZnak);
 
             return hraciPole;
 
