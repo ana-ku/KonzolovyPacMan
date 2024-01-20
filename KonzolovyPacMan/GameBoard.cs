@@ -75,43 +75,36 @@ namespace KonzolovyPacMan
         public string[] ZmenPoziciHrace(string[] hraciPole, int vyska, int sirka)
         {
             //Uložím si předchozí souřadnice
-            player.PredchoziSouradniceHrace.X = player.SouradniceHrace.X;
-            player.PredchoziSouradniceHrace.Y = player.SouradniceHrace.Y;
-
-            int a = player.PredchoziSouradniceHrace.X;
-            int b = player.PredchoziSouradniceHrace.Y;
-
-            int y = player.SouradniceHrace.Y;
-            int x = player.SouradniceHrace.X;
+            Pozice novaPozice = player.SouradniceHrace; //novaPozice podstoupi změny dle UserInputu, pokud nebude na nové pozici překážka, stanou se z ní nové player.SouradniceHrace. Pokud tam bude překážka, souřadnice hráče se neaktualizují.
 
             //Přiřazení nových souřadnic, přejímaných z informací z UserInput
 
             switch (userInput.SmerPohybu)
             {
                 case "Y-":
-                    if (y > 0)
+                    if (novaPozice.Y > 0)
                     {
-                        y--;
+                        novaPozice.Y--;
                     }
                     //kontroluje, jestli hráč nevyjel z canvasu
                     break;
                 case "Y+":
-                    if (y < vyska - 1)
+                    if (novaPozice.Y < vyska - 1)
                     {
-                        y++;
+                        novaPozice.Y++;
                     }
                     break;
                 case "X-":
-                    if (x > 1)
+                    if (novaPozice.X > 1)
                     {
-                        x--;
+                        novaPozice.X--;
                     }
                     break;
 
                 case "X+":
-                    if (x < sirka)
+                    if (novaPozice.X < sirka)
                     {
-                        x++;
+                        novaPozice.X++;
                     }
                     break;
             }
@@ -119,32 +112,26 @@ namespace KonzolovyPacMan
 
             //Kontrola, jestli není na nově přistupovaném poli znak X
 
-            string radek = hraciPole[y];
+            string radek = hraciPole[novaPozice.Y];
 
-            string znak = radek[x].ToString();
+            string znak = radek[novaPozice.X].ToString();
 
             if (znak != PrekazkaZnak) //pohnu hráčem
             {
-                //Vymažu současnou pozici
-                hraciPole[b] = hraciPole[b].Remove(a, 1).Insert(a, " ");
+                //Vymažu hráče na předchozí pozici
+                NastavZnak(hraciPole, player.SouradniceHrace, " ");
+                
+                //Vepíšu hráče na současnou pozici
+                NastavZnak(hraciPole, novaPozice, HracZnak);
 
-
-                //pak provedu změnu pozice
-
-                hraciPole[y] = hraciPole[y].Remove(x, 1).Insert(x, HracZnak);
-
+            
                 if (znak == PokladZnak)
                 {
                     PocetDrahokamu--;
                 }
-                player.SouradniceHrace.X = x;
-                player.SouradniceHrace.Y = y;
+                player.SouradniceHrace = novaPozice;
             }
-            else
-            {
-                player.SouradniceHrace.X = a;
-                player.SouradniceHrace.Y = b;
-            }
+           
 
             return hraciPole;
 
@@ -152,6 +139,11 @@ namespace KonzolovyPacMan
         public bool VyhralHrac() //AI: jednodušší kontrola podmínky ve hře
         {
             return PocetDrahokamu == 0; //hodnota bude false, dokud nebude splněná return podmínka
+        }
+        public void NastavZnak(string[] hraciPole, Pozice pozice, string znak)
+        {
+            hraciPole[pozice.Y] = hraciPole[pozice.Y].Remove(pozice.X, 1).Insert(pozice.X, znak);
+
         }
     }
 }

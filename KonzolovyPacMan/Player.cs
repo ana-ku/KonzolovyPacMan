@@ -10,7 +10,5 @@ namespace KonzolovyPacMan
     internal class Player
     {
         public Pozice SouradniceHrace = new Pozice();
-        public Pozice PredchoziSouradniceHrace = new Pozice();
-
     }
 }
